@@ -60,9 +60,9 @@ const { uploadImages } = require('../tools/fetcher')
 const { ind, eng } = require('./text/lang/')
 const { daily, level, register, afk, reminder, premium, limit} = require('../function')
 const cd = 4.32e+7
-const limitCount = 25
+const limitCount = 30
 const errorImg = 'https://i.ibb.co/jRCpLfn/user.png'
-const dateNow = moment.tz('Asia/Jakarta').format('DD-MM-YYYY')
+const dateNow = moment.tz('Asia/Kolkata').format('DD-MM-YYYY')
 const ocrconf = {
     lang: 'eng',
     oem: '1',
@@ -111,8 +111,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
         const cmd = caption || body || ''
         const command = cmd.toLowerCase().split(' ')[0] || ''
-        const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~!#$%^&./\\©^]/.test(command) ? command.match(/^[°•π÷×¶∆£¢€¥®™✓=|~!#$%^&./\\©^]/gi) : '-' // Multi-Prefix by: VideFrelan
-        const chats = (type === 'chat') ? body : ((type === 'image' || type === 'video')) ? caption : ''
+        //const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~!#$%^&./\\©^]/.test(command) ? command.match(/^[°•π÷×¶∆£¢€¥®™✓=|~!#$%^&./\\©^]/gi) : '-' // Multi-Prefix by: VideFrelan
+        const prefix = /^[°•π÷×¶∆£¢€¥®™✓=|~!$%^&./\\©^]/.test(command) ? command.match(/^[°•π÷×¶∆£¢€¥®™✓!=|~$%^&./\\©^]/gi): '-'
+		const chats = (type === 'chat') ? body : ((type === 'image' || type === 'video')) ? caption : ''
         body = (type === 'chat' && body.startsWith(prefix)) ? body : (((type === 'image' || type === 'video') && caption) && caption.startsWith(prefix)) ? caption : ''
         const args = body.trim().split(/ +/).slice(1)
         const uaOverride = config.uaOverride
@@ -233,7 +234,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 const valid = await bocchi.inviteInfo(chats)
                 if (valid) {
                     console.log(color('[KICK]', 'red'), color('Received a group link and it is a valid link!', 'yellow'))
-                    await bocchi.reply(from, ind.linkDetected(), id)
+                    await bocchi.reply(from, eng.linkDetected(), id)
                     await bocchi.removeParticipant(groupId, sender.id)
                 } else {
                     console.log(color('[WARN]', 'yellow'), color('Received a group link but it is not a valid link!', 'yellow'))
@@ -274,7 +275,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     if (err) return console.error(err)
                     if (status) {
                         console.log(color('[NSFW]', 'red'), color('The link is classified as NSFW!', 'yellow'))
-                        await bocchi.reply(from, ind.linkNsfw(), id)
+                        await bocchi.reply(from, eng.linkNsfw(), id)
                         await bocchi.removeParticipant(groupId, sender.id)
                     } else {
                         console.log(('[NEUTRAL]'), color('The link is safe!'))
@@ -306,13 +307,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     const getId = afk.getAfkId(ment, _afk)
                     const getReason = afk.getAfkReason(getId, _afk)
                     const getTime = afk.getAfkTime(getId, _afk)
-                    await bocchi.reply(from, ind.afkMentioned(getReason, getTime), id)
+                    await bocchi.reply(from, eng.afkMentioned(getReason, getTime), id)
                 }
             }
             if (afk.checkAfkUser(sender.id, _afk) && !isCmd) {
                 _afk.splice(afk.getAfkPosition(sender.id, _afk), 1)
                 fs.writeFileSync('./database/user/afk.json', JSON.stringify(_afk))
-                await bocchi.sendText(from, ind.afkDone(pushname))
+                await bocchi.sendText(from, eng.afkDone(pushname))
             }
         }
 
@@ -347,23 +348,23 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
             // Register by Slavyan
             case prefix+'register':
-                if (isRegistered) return await bocchi.reply(from, ind.registeredAlready(), id)
-                if (isGroupMsg) return await bocchi.reply(from, ind.pcOnly(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (isRegistered) return await bocchi.reply(from, eng.registeredAlready(), id)
+                if (isGroupMsg) return await bocchi.reply(from, eng.pcOnly(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const namaUser = q.substring(0, q.indexOf('|') - 1)
                 const umurUser = q.substring(q.lastIndexOf('|') + 2)
                 const serialUser = createSerial(20)
-                if (Number(umurUser) >= 40) return await bocchi.reply(from, ind.ageOld(), id)
+                if (Number(umurUser) >= 40) return await bocchi.reply(from, eng.ageOld(), id)
                 register.addRegisteredUser(sender.id, namaUser, umurUser, time, serialUser, _registered)
-                await bocchi.reply(from, ind.registered(namaUser, umurUser, sender.id, time, serialUser), id)
+                await bocchi.reply(from, eng.registered(namaUser, umurUser, sender.id, time, serialUser), id)
                 console.log(color('[REGISTER]'), color(time, 'yellow'), 'Name:', color(namaUser, 'cyan'), 'Age:', color(umurUser, 'cyan'), 'Serial:', color(serialUser, 'cyan'))
             break
 
             // Level [BETA] by Slavyan
             case prefix+'level':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isLevelingOn) return await bocchi.reply(from, ind.levelingNotOn(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isLevelingOn) return await bocchi.reply(from, eng.levelingNotOn(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
                 const userLevel = level.getLevelingLevel(sender.id, _level)
                 const userXp = level.getLevelingXp(sender.id, _level)
                 const ppLink = await bocchi.getProfilePicFromServer(sender.id)
@@ -396,9 +397,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'leaderboard':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isLevelingOn) return await bocchi.reply(from, ind.levelingNotOn(), id)
-                if (!isGroupMsg) return await bocchi.reply(from. ind.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isLevelingOn) return await bocchi.reply(from, eng.levelingNotOn(), id)
+                if (!isGroupMsg) return await bocchi.reply(from. eng.groupOnly(), id)
                 const resp = _level
                 _level.sort((a, b) => (a.xp < b.xp) ? 1 : -1)
                 let leaderboard = '*── 「 LEADERBOARDS 」 ──*\n\n'
@@ -451,17 +452,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.reply(from, leaderboard, id)
                 } catch (err) {
                     console.error(err)
-                    await bocchi.reply(from, ind.minimalDb(), id)
+                    await bocchi.reply(from, eng.minimalDb(), id)
                 }
             break
 
             // Downloader
             case prefix+'joox': // By Hafizh
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const dataJoox = await axios.get(`https://api.vhtear.com/music?query=${q}&apikey=${config.vhtear}`)
                 const cardJoox = new canvas.Spotify()
                     .setAuthor(dataJoox.data.result[0].penyanyi)
@@ -473,7 +474,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 cardJoox.build()
                     .then(async (buffer) => {
                         canvas.write(buffer, `${sender.id}_joox.png`)
-                        await bocchi.sendFile(from, `${sender.id}_joox.png`, 'joox.png', ind.joox(dataJoox.data), id)
+                        await bocchi.sendFile(from, `${sender.id}_joox.png`, 'joox.png', eng.joox(dataJoox.data), id)
                         fs.unlinkSync(`${sender.id}_joox.png`)
                         await bocchi.sendFileFromUrl(from, dataJoox.data.result[0].linkMp3, 'joox.mp3', '', id)
                     })
@@ -484,11 +485,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'igdl': // by: VideFrelan
             case prefix+'instadl':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('instagram.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('instagram.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.insta(url)
                     .then(async ({ result }) => {
                         for (let i = 0; i < result.post.length; i++) {
@@ -507,11 +508,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break 
             case prefix+'facebook':
             case prefix+'fb':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(pushname), id)
-                if (!isUrl(url) && !url.includes('facebook.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(pushname), id)
+                if (!isUrl(url) && !url.includes('facebook.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.fb(url)
                     .then(async ({ result }) => {
                             await bocchi.sendFileFromUrl(from, result.VideoUrl, 'videofb.mp4', '', id)
@@ -523,17 +524,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
                 case prefix+'ytmp3':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('youtu.be')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('youtu.be')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.ytdl(url)
                     .then(async ({result}) => {
                         if (Number(result.size.split(' MB')[0]) >= 30) {
-                            await bocchi.reply(from, ind.musiclimit(), id)
+                            await bocchi.reply(from, eng.musiclimit(), id)
                         } else {
-                            await bocchi.sendFileFromUrl(from, result.imgUrl, `${result.title}.jpg`, ind.ytFound(result), id)
+                            await bocchi.sendFileFromUrl(from, result.imgUrl, `${result.title}.jpg`, eng.ytFound(result), id)
                             await bocchi.sendFileFromUrl(from, result.UrlMp3, `${result.title}.mp3`, '', id)
                             console.log('Success sending YouTube video!')
                         }
@@ -544,17 +545,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'ytmp4':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('youtu.be')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('youtu.be')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.ytdl(url)
                     .then(async ({result}) => {
                         if (Number(result.size.split(' MB')[0]) >= 30) {
-                            await bocchi.reply(from, ind.videoLimit(), id)
+                            await bocchi.reply(from, eng.videoLimit(), id)
                         } else {
-                            await bocchi.sendFileFromUrl(from, result.imgUrl, `${result.title}.jpg`, ind.ytFound(result), id)
+                            await bocchi.sendFileFromUrl(from, result.imgUrl, `${result.title}.jpg`, eng.ytFound(result), id)
                             await bocchi.sendFileFromUrl(from, result.UrlVideo, `${result.title}.mp3`, '', id)
                             console.log('Success sending YouTube video!')
                         }
@@ -565,11 +566,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'tiktokpic':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     console.log(`Get profile pic for ${q}`)
                     const tkt = await axios.get(`https://docs-jojo.herokuapp.com/api/tiktokpp?user=${q}`)
@@ -583,11 +584,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'tiktoknowm': // by: VideFrelan
             case prefix+'tktnowm':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('tiktok.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('tiktok.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.tikNoWm(url)
                     .then(async ({ result }) => {
                         await bocchi.sendFileFromUrl(from, result.thumb, 'TiktokNoWM.jpg', `➸ *Username*: ${result.username}\n➸ *Caption*: ${result.caption}\n➸ *Uploaded on*: ${result.uploaded_on}\n\nSedang dikirim, sabar ya...`, id)
@@ -604,11 +605,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'tiktok':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('tiktok.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('tiktok.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.tik(url)
                     .then(async ({ result })=> {
                         await bocchi.sendFileFromUrl(from, result.video, 'TikTok.mp4', '', id)
@@ -621,11 +622,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'twitter':
             case prefix+'twt':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('twitter.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('twitter.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.tweet(url)
                     .then(async (data) => {
                         if (data.type === 'video') {
@@ -655,11 +656,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'moddroid': // Chikaa Chantekkzz
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.modroid(q)
                     .then(async ({ status, result }) => {
                         if (status !== 200) {
@@ -675,11 +676,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'happymod': // chikaa chantexxzz
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 downloader.happymod(q)
                     .then(async ({ status, result }) => {
                         if (status !== 200) {
@@ -695,10 +696,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'linedl': // chikaa chantexxzz
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (isGroupMsg) return await bocchi.reply(from, ind.pcOnly(), id)
-                if (!isUrl(url) && !url.includes('store.line.me')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (isGroupMsg) return await bocchi.reply(from, eng.pcOnly(), id)
+                if (!isUrl(url) && !url.includes('store.line.me')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 downloader.line(url)
                     .then(async (res) => {
@@ -716,9 +717,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
             // Misc
             case prefix+'ocr': // by: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage || isQuotedSticker) {
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage || isQuotedSticker ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     fs.writeFileSync(`./temp/${sender.id}.jpg`, mediaData)
@@ -732,16 +733,16 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'google': // chika-chantekkzz
             case prefix+'googlesearch':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 google({ 'query': q, 'no-display': true })
                     .then(async (results) => {
                         let txt = `*── 「 GOOGLE SEARCH 」 ──*\n\n*by: rashidsiregar28*\n\n_*Search results for: ${q}*_`
@@ -756,29 +757,29 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'say':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.sendText(from, q)
             break
             case prefix+'afk': // by Slavyan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (isAfkOn) return await bocchi.reply(from, ind.afkOnAlready(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (isAfkOn) return await bocchi.reply(from, eng.afkOnAlready(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const reason = q ? q : 'Nothing.'
                 afk.addAfkUser(sender.id, time, reason, _afk)
-                await bocchi.reply(from, ind.afkOn(pushname, reason), id)
+                await bocchi.reply(from, eng.afkOn(pushname, reason), id)
             break
             case prefix+'lyric':
             case prefix+'lirik':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.lirik(q)
                     .then(async ({ result }) => {
                         if (result.code !== 200) return await bocchi.reply(from, 'Not found.', id)
@@ -791,22 +792,22 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'shortlink':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url)) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url)) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const urlShort = await misc.shortener(url)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.reply(from, urlShort, id)
                 console.log('Success!')
             break
             case prefix+'wikipedia':
             case prefix+'wiki':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.wiki(q)
                     .then(async ({ result, status }) => {
                         if (status !== 200) {
@@ -822,11 +823,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'wikien': // By: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.wikien(q)
                     .then(async ( { result }) => {
                         if (result.status !== '200') {
@@ -842,11 +843,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'corona': // by CHIKAA CHANTEKKXXZZ
             case prefix+'coronavirus':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.corona(q)
                     .then(async (res) => {
                         await bocchi.sendText(from, '🌎️ Covid Info - ' + q.charAt(0).toUpperCase() + q.slice(1) + ' 🌍️\n\n✨️ Total Cases: ' + `${res.cases}` + '\n📆️ Today\'s Cases: ' + `${res.todayCases}` + '\n☣️ Total Deaths: ' + `${res.deaths}` + '\n☢️ Today\'s Deaths: ' + `${res.todayDeaths}` + '\n⛩️ Active Cases: ' + `${res.active}` + '.')
@@ -858,11 +859,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'ttp': // CHIKAA CHANTEKKXXZZ
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.ttp(q)
                     .then(async (res) => {
                         await bocchi.sendImageAsSticker(from, res.base64, { author: authorWm, pack: packWm })
@@ -875,11 +876,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'genshininfo': // chika chantexxzz
             case prefix+'genshin':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     console.log('Searching for character...')
                     const character = await genshin.characters(q)
@@ -891,9 +892,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'jadwaltv': // Chika chantexxzz
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (ar.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (ar.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     const jtv = await axios.get(`http://api.hurtzcrafter.xyz/jadwaltv?channel=${ar[0]}`)
                     if (jtv.data.status === 'true') {
@@ -912,11 +913,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'instastory': // By: VideFrelan
             case prefix+'igstory':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.its(q)
                     .then(async ({ result }) => {
                         for (let i = 0; i < result.story.itemlist.length; i++) {
@@ -927,11 +928,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'kbbi':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.kbbi(q)
                     .then(async ({ result }) => {
                         await bocchi.reply(from, result.hasil, id)
@@ -943,10 +944,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'linesticker':
             case prefix+'linestiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 if (!isOwner) limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.linesticker()
                     .then(async ({ result }) => {
                         let lines = '*── 「 LINE STICKERS 」 ──*'
@@ -963,9 +964,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'jadwalsholat':
             case prefix+'jadwalsolat':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.jadwalSholat(q)
                     .then((data) => {
                         data.map(async ({isya, subuh, dzuhur, ashar, maghrib, terbit}) => {
@@ -985,8 +986,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'gempa':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.bmkg()
                     .then(async ({ kedalaman, koordinat, lokasi, magnitude, map, potensi, waktu }) => {
                         const teksInfo = `${lokasi}\n\nKoordinat: ${koordinat}\nKedalaman: ${kedalaman}\nMagnitudo: ${magnitude} SR\nPotensi: ${potensi}\n\n${waktu}`
@@ -999,11 +1000,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'igstalk':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.igStalk(q)
                     .then(async ({ graphql }) => {
                         if (graphql === undefined) {
@@ -1021,15 +1022,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'gsmarena':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.gsmarena(q)
                         .then(async ({ result }) => {
-                            await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, ind.gsm(result), id)
+                            await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, eng.gsm(result), id)
                             console.log('Success sending phone info!')
                         })
                 } catch (err) {
@@ -1039,15 +1040,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'receipt':
             case prefix+'resep':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.resep(q)
                         .then(async ({ result }) => {
-                            await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, ind.receipt(result), id)
+                            await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, eng.receipt(result), id)
                             console.log('Success sending food receipt!')
                         })
                 } catch (err) {
@@ -1057,11 +1058,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'findsticker':
             case prefix+'findstiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.sticker(q)
                         .then(async ({ result }) => {
@@ -1077,11 +1078,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'movie':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.movie(q)
                     .then(async ({ result }) => {
                         let movies = `Result for: *${result.judul}*`
@@ -1098,11 +1099,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'cekongkir': // By: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const kurir = q.substring(0, q.indexOf('|') - 1)
                 const askot = q.substring(q.indexOf('|') + 2, q.lastIndexOf('|') - 1)
                 const tukot = q.substring(q.lastIndexOf('|') + 2)
@@ -1122,9 +1123,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'distance':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const kotaAsal = q.substring(0, q.indexOf('|') - 1)
                 const kotaTujuan = q.substring(q.lastIndexOf('|') + 2)
@@ -1140,17 +1141,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'ytsearch':
             case prefix+'yts':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.ytSearch(q)
                         .then(async ({ result }) => {
                             for (let i = 0; i < 5; i++) {
                                 const { urlyt, image, title, channel, duration, views } = await result[i]
-                                await bocchi.sendFileFromUrl(from, image, `${title}.jpg`, ind.ytResult(urlyt, title, channel, duration, views), id)
+                                await bocchi.sendFileFromUrl(from, image, `${title}.jpg`, eng.ytResult(urlyt, title, channel, duration, views), id)
                                 console.log('Success sending YouTube results!')
                             }
                         })
@@ -1160,9 +1161,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'tts':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const speech = q.substring(q.indexOf('|') + 2)
                 const ptt = tts(ar[0])
@@ -1177,11 +1178,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'tomp3': // by: Piyobot
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isVideo || isQuotedVideo) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedVideo ? quotedMsg : message
                     const _mimetype = isQuotedVideo ? quotedMsg.mimetype : mimetype
                     console.log(color('[WAPI]', 'green'), 'Downloading and decrypting media...')
@@ -1208,15 +1209,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             .save(fileOutputPath)
                     })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'toptt':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isAudio || isQuotedAudio) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedAudio ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const name = new Date() * 1
@@ -1224,22 +1225,22 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.sendPtt(from, `./temp/audio/${name}.mp3`, id)
                     fs.unlinkSync(`./temp/audio/${name}.mp3`)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'playstore':
             case prefix+'ps':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.playstore(q)
                         .then(async ({ result }) => {
                             for (let i = 0; i < 5; i++) {
                                 const { app_id, icon, title, developer, description, price, free } = result[i]
-                                await bocchi.sendFileFromUrl(from, icon, `${title}.jpg`, ind.playstore(app_id, title, developer, description, price, free))
+                                await bocchi.sendFileFromUrl(from, icon, `${title}.jpg`, eng.playstore(app_id, title, developer, description, price, free))
                             }
                             console.log('Success sending PlayStore result!')
                         })
@@ -1249,30 +1250,30 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'math':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (typeof mathjs.evaluate(q) !== 'number') {
-                    await bocchi.reply(from, ind.notNum(q), id)
+                    await bocchi.reply(from, eng.notNum(q), id)
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     await bocchi.reply(from, `*── 「 MATH 」 ──*\n\n${q} = ${mathjs.evaluate(q)}`, id)
                 }
             break
             case prefix+'shopee':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const namaBarang = q.substring(0, q.indexOf('|') - 1)
                 const jumlahBarang = q.substring(q.lastIndexOf('|') + 2)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     misc.shopee(namaBarang, jumlahBarang)
                         .then(async ({ result }) => {
                             for (let i = 0; i < result.items.length; i++) {
                                 const { nama, harga, terjual, shop_location, description, link_product, image_cover } = result.items[i]
-                                await bocchi.sendFileFromUrl(from, image_cover, `${nama}.jpg`, ind.shopee(nama, harga, terjual, shop_location, description, link_product))
+                                await bocchi.sendFileFromUrl(from, image_cover, `${nama}.jpg`, eng.shopee(nama, harga, terjual, shop_location, description, link_product))
                             }
                             console.log('Success sending Shopee data!')
                         })
@@ -1282,27 +1283,27 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'mutual':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) return await bocchi.reply(from, 'Command ini tidak bisa digunakan di dalam grup!', id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.reply(from, 'Looking for a partner...', id)
                 await bocchi.sendContact(from, register.getRegisteredRandomId(_registered))
                 await bocchi.sendText(from, `Partner found: 🙉\n*${prefix}next* — find a new partner`)
             break
             case prefix+'next':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) return await bocchi.reply(from, 'Command ini tidak bisa digunakan di dalam grup!', id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.reply(from, 'Looking for a partner...', id)
                 await bocchi.sendContact(from, register.getRegisteredRandomId(_registered))
                 await bocchi.sendText(from, `Partner found: 🙉\n*${prefix}next* — find a new partner`)
             break
             case prefix+'tafsir':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (args.length === 0) return bocchi.reply(from, `Untuk menampilkan ayat Al-Qur'an tertentu beserta tafsir dan terjemahannya\ngunakan ${prefix}tafsir surah ayat\n\nContoh: ${prefix}tafsir Al-Mulk 10`, id)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const responSurah = await axios.get('https://raw.githubusercontent.com/VideFrelan/words/main/tafsir.txt')
                 const { data } = responSurah.data
                 const idx = data.findIndex((post) => {
@@ -1320,8 +1321,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'listsurah':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.listSurah()
                     .then(async ({ result }) => {
                         let list = '*── 「 AL-QUR\'AN 」 ──*\n\n'
@@ -1337,9 +1338,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'surah':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.getSurah(args[0])
                     .then(async ({ result }) => {
                         await bocchi.reply(from, `${result.surah}\n\n${result.quran}`, id)
@@ -1352,9 +1353,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'hadis': // irham01
             case prefix+'hadees':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (ar.length !== 1) return await bocchi.reply(from, ind.hadis(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (ar.length !== 1) return await bocchi.reply(from, eng.hadis(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     if (ar[0] === 'darimi') {
                         const hdar = await axios.get(`https://api.hadith.sutanlab.id/books/darimi/${args[1]}`)
@@ -1384,7 +1385,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         const habud = await axios.get(`https://api.hadith.sutanlab.id/books/abu-daud/${args[1]}`)
                         await bocchi.sendText(from, `${habud.data.data.contents.arab}\n${habud.data.data.contents.id}\n\n*H.R. Abu Daud*`, id)
                     } else {
-                        await bocchi.sendText(from, ind.hadis(), id)
+                        await bocchi.sendText(from, eng.hadis(), id)
                     }
                 } catch (err) {
                     console.error(err)
@@ -1392,22 +1393,22 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'asmaulhusna': // irham01
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const asmaulHusna = await axios.get (`https://api-melodicxt-2.herokuapp.com/api/asmaallHusna?number=${args[0]}&apiKey=${config.melodic}`)
                 const assna = asmaulHusna.data.result
-                bocchi.sendFileFromUrl(from, 'https://i2.wp.com/seruni.id/wp-content/uploads/2016/09/Allah.png?resize=696%2C696&ssl=1', 'gambar.jpg', ind.asmaulHusna(assna), id)
+                bocchi.sendFileFromUrl(from, 'https://i2.wp.com/seruni.id/wp-content/uploads/2016/09/Allah.png?resize=696%2C696&ssl=1', 'gambar.jpg', eng.asmaulHusna(assna), id)
             break
             case prefix+'randomquran': // irham01
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 const ranquran = await axios.get('https://api.zeks.xyz/api/randomquran')
                 const auquran = ranquran.data.result.audio
-                await bocchi.reply(from, ind.randomQuran(ranquran), id)
+                await bocchi.reply(from, eng.randomQuran(ranquran), id)
                 await bocchi.sendFileFromUrl(from, auquran, 'rquran.mp3', '', id)
             break
             case prefix+'motivasi':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 misc.motivasi()
                     .then(async (body) => {
@@ -1421,15 +1422,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'play':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.ytPlay(q)
                     .then(async ({ result }) => {
                         if (Number(result.size.split(' MB')[0]) >= 10.0) return bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, `Judul: ${result.title}\nSize: *${result.size}*\n\nGagal, Maksimal video size adalah *10MB*!`, id)
-                        await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, ind.ytPlay(result), id)
+                        await bocchi.sendFileFromUrl(from, result.image, `${result.title}.jpg`, eng.ytPlay(result), id)
                         const responses = await fetch(result.mp3)
                         const buffer = await responses.buffer()
                         await fs.writeFile(`./temp/ytplay_${sender.id}.mp3`, buffer)
@@ -1443,11 +1444,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'playv': // Alvio Adji Januar 
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait() ,id)
+                await bocchi.reply(from, eng.wait() ,id)
                 const getvid = await axios.get(`https://api.zeks.xyz/api/ytplaymp4/2?apikey=apivinz&q=${q}`)
                 if (getvid.data.status === false) {
                     await bocchi.reply(from, getvid.data.message, id)
@@ -1459,11 +1460,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'whois':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.whois(args[0])
                     .then(async ({ result }) => {
                         await bocchi.reply(from, `*── 「 WHOIS 」 ──*\n\n➸ *IP address*: ${result.ip_address}\n➸ *City*: ${result.city}\n➸ *Region*: ${result.region}\n➸ *Country*: ${result.country}\n➸ *ZIP code*: ${result.postal_code}\n➸ *Latitude and longitude*: ${result.latitude_longitude}\n➸ *Time zone*: ${result.time_zone}\n➸ *Call code*: ${result.calling_code}\n➸ *Currency*: ${result.currency}\n➸ *Language code*: ${result.languages}\n➸ *ASN*: ${result.asn}\n➸ *Organization*: ${result.org}`, id)
@@ -1474,14 +1475,14 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'email': // By: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const emailTarget = q.substring(0, q.indexOf('|') - 1)
                 const subjectEmail = q.substring(q.indexOf('|') + 2, q.lastIndexOf('|') - 1)
                 const messageEmail = q.substring(q.lastIndexOf('|') + 2)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.email(emailTarget, subjectEmail, messageEmail)
                     .then(async ({ result }) => {
                         if (result.status === '204') {
@@ -1493,13 +1494,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'sms':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const pesanPengirim = q.substring(0, q.indexOf('|') - 1)
                 const nomorPenerima = q.substring(q.lastIndexOf('|') + 2)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.sms(nomorPenerima, pesanPengirim)
                     .then(async ({ status, pesan }) => {
                         if (status !== 'success') return await bocchi.reply(from, pesan, id)
@@ -1513,42 +1514,42 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'addsticker': // by @hardianto02_
             case prefix+'addstiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id) 
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id) 
                 if (isQuotedSticker) {
                     if (_stick.includes(q)) {
-                        await bocchi.reply(from, ind.stickerAddAlready(q), id)
+                        await bocchi.reply(from, eng.stickerAddAlready(q), id)
                     } else { 
                         _stick.push(q)
                         fs.writeFileSync('./database/sticker.json', JSON.stringify(_stick))
                         const mediaData = await decryptMedia(quotedMsg, uaOverride)
                         fs.writeFileSync(`./temp/sticker/${q}.webp`, mediaData)
-                        await bocchi.reply(from, ind.stickerAdd(), id)
+                        await bocchi.reply(from, eng.stickerAdd(), id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'delsticker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
                 if (_stick.includes(q)) {
                     _stick.splice(q, 1)
                     fs.writeFileSync('./database/sticker.json', JSON.stringify(_stick))
                     fs.unlinkSync(`./temp/sticker/${q}.webp`)
-                    await bocchi.reply(from, ind.stickerDel(), id)
+                    await bocchi.reply(from, eng.stickerDel(), id)
                 } else {
-                    await bocchi.reply(from, ind.stickerNotFound())
+                    await bocchi.reply(from, eng.stickerNotFound())
                 }
             break
             case prefix+'stickerlist':
             case prefix+'liststicker':
             case prefix+'stikerlist':
             case prefix+'liststiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
                 let stickerList = `*── 「 STICKER DATABASE 」 ──*\nTotal: ${_stick.length}\n\n`
                 for (let i of _stick) {
                     stickerList += `➸ ${i.replace(_stick)}\n`
@@ -1556,13 +1557,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 await bocchi.sendText(from, stickerList)
             break
             case prefix+'toxic':
-                if (!isRegistered) return await bocchi.reply(from , ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from , eng.notRegistered(), id)
                 await bocchi.reply(from, toxic(), id)
             break
             case prefix+'alkitab':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                await bocchi.reply(from, ind.wait(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.alkitab(q)
                     .then(async ({ result }) => {
                         let alkitab = '*── 「 AL-KITAB 」 ──*'
@@ -1574,18 +1575,18 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'reminder': // by Slavyan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const timeRemind = q.substring(0, q.indexOf('|') - 1)
                 const messRemind = q.substring(q.lastIndexOf('|') + 2)
                 const parsedTime = ms(toMs(timeRemind))
                 reminder.addReminder(sender.id, messRemind, timeRemind, _reminder)
-                await bocchi.sendTextWithMentions(from, ind.reminderOn(messRemind, parsedTime, sender))
+                await bocchi.sendTextWithMentions(from, eng.reminderOn(messRemind, parsedTime, sender))
                 const intervRemind = setInterval(async () => {
                     if (Date.now() >= reminder.getReminderTime(sender.id, _reminder)) {
-                        await bocchi.sendTextWithMentions(from, ind.reminderAlert(reminder.getReminderMsg(sender.id, _reminder), sender))
+                        await bocchi.sendTextWithMentions(from, eng.reminderAlert(reminder.getReminderMsg(sender.id, _reminder), sender))
                         _reminder.splice(reminder.getReminderPosition(sender.id, _reminder), 1)
                         fs.writeFileSync('./database/user/reminder.json', JSON.stringify(_reminder))
                         clearInterval(intervRemind)
@@ -1594,24 +1595,24 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'imagetourl':
             case prefix+'imgtourl':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const linkImg = await uploadImages(mediaData, `${sender.id}_img`)
                     await bocchi.reply(from, linkImg, id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'infohoax':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.infoHoax()
                     .then(async ({ result }) => {
                         let txt = '*── 「 HOAX 」 ──*'
@@ -1628,10 +1629,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'trending':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.trendingTwt()
                     .then(async ({ result }) => {
                         let txt = '*── 「 TWITTER TRENDING 」 ──*'
@@ -1648,10 +1649,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'jobseek':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.jobSeek()
                     .then(async ({ result }) => {
                         let txt = '*── 「 JOOB SEEK 」 ──*'
@@ -1669,11 +1670,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'call':
             case prefix+'spamcall':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.call(q)
                     .then(async ({ result }) => {
                         await bocchi.reply(from, result.logs, id)
@@ -1685,13 +1686,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'spamsms':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 2) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (isNaN(Number(args[0])) && isNaN(Number(args[1]))) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 2) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (isNaN(Number(args[0])) && isNaN(Number(args[1]))) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (Number(args[1]) > 10) return await bocchi.reply(from, 'Maximum 10 SMS.', id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.spamsms(args[0], args[1])
                     .then(async ({ status, logs, msg }) => {
                         if (status !== 200) {
@@ -1708,21 +1709,21 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'translate':
             case prefix+'trans':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const texto = q.substring(0, q.indexOf('|') - 1)
                 const languaget = q.substring(q.lastIndexOf('|') + 2)
                 translate(texto, {to: languaget}).then(res => {bocchi.reply(from, res.text, id)})
             break
             case prefix+'bass':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isAudio || isQuotedAudio || isVoice || isQuotedVoice) {
-                    if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedAudio || isQuotedVoice ? quotedMsg : message
                     console.log(color('[WAPI]', 'green'), 'Downloading and decrypting media...')
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
@@ -1749,15 +1750,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             .save(fileOutputPath)
                     })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'nightcore':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isAudio || isQuotedAudio || isVoice || isQuotedVoice) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedAudio || isQuotedVoice ? quotedMsg : message
                     console.log(color('[WAPI]', 'green'), 'Downloading and decrypting media...')
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
@@ -1784,7 +1785,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             .save(fileOutputPath)
                     })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
 
@@ -1795,74 +1796,74 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 const levelMenu = level.getLevelingLevel(sender.id, _level)
                 const xpMenu = level.getLevelingXp(sender.id, _level)
                 const reqXpMenu = 5 * Math.pow(levelMenu, 2) + 50 * 1 + 100
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (args[0] === '1') {
-                    await bocchi.sendText(from, ind.menuDownloader())
+                    await bocchi.sendText(from, eng.menuDownloader())
                 } else if (args[0] === '2') {
-                    await bocchi.sendText(from, ind.menuBot())
+                    await bocchi.sendText(from, eng.menuBot())
                 } else if (args[0] === '3') {
-                    await bocchi.sendText(from, ind.menuMisc())
+                    await bocchi.sendText(from, eng.menuMisc())
                 } else if (args[0] === '4') {
-                    await bocchi.sendText(from, ind.menuSticker())
+                    await bocchi.sendText(from, eng.menuSticker())
                 } else if (args[0] === '5') {
-                    await bocchi.sendText(from, ind.menuWeeaboo())
+                    await bocchi.sendText(from, eng.menuWeeaboo())
                 } else if (args[0] === '6') {
-                    await bocchi.sendText(from, ind.menuFun())
+                    await bocchi.sendText(from, eng.menuFun())
                 } else if (args[0] === '7') {
-                    await bocchi.sendText(from, ind.menuModeration())
+                    await bocchi.sendText(from, eng.menuModeration())
                 } else if (args[0] === '8') {
-                    if (isGroupMsg && !isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    await bocchi.sendText(from, ind.menuNsfw())
+                    if (isGroupMsg && !isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    await bocchi.sendText(from, eng.menuNsfw())
                 } else if (args[0] === '9') {
-                    if (!isOwner) return await bocchi.reply(from, ind.ownerOnly())
-                    await bocchi.sendText(from, ind.menuOwner())
+                    if (!isOwner) return await bocchi.reply(from, eng.ownerOnly())
+                    await bocchi.sendText(from, eng.menuOwner())
                 } else if (args[0] === '10') {
-                    if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                    await bocchi.sendText(from, ind.menuLeveling())
+                    if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                    await bocchi.sendText(from, eng.menuLeveling())
                 } else {
-                    await bocchi.sendText(from, ind.menu(jumlahUser, levelMenu, xpMenu, role, pushname, reqXpMenu, isPremium ? 'YES' : 'NO'))
+                    await bocchi.sendText(from, eng.menu(jumlahUser, levelMenu, xpMenu, role, pushname, reqXpMenu, isPremium ? 'YES' : 'NO'))
                 }
             break
             case prefix+'rules':
             case prefix+'rule':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                await bocchi.sendText(from, ind.rules())
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                await bocchi.sendText(from, eng.rules())
             break
             case prefix+'nsfw':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 if (ar[0] === 'enable') {
-                    if (isNsfw) return await bocchi.reply(from, ind.nsfwAlready(), id)
+                    if (isNsfw) return await bocchi.reply(from, eng.nsfwAlready(), id)
                     _nsfw.push(groupId)
                     fs.writeFileSync('./database/group/nsfw.json', JSON.stringify(_nsfw))
-                    await bocchi.reply(from, ind.nsfwOn(), id)
+                    await bocchi.reply(from, eng.nsfwOn(), id)
                 } else if (ar[0] === 'disable') {
                     _nsfw.splice(groupId, 1)
                     fs.writeFileSync('./database/group/nsfw.json', JSON.stringify(_nsfw))
-                    await bocchi.reply(from, ind.nsfwOff(), id)
+                    await bocchi.reply(from, eng.nsfwOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'status':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 await bocchi.sendText(from, `*RAM*: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB / ${Math.round(os.totalmem / 1024 / 1024)} MB\n*CPU*: ${os.cpus()[0].model}`)
             break
             case prefix+'listblock':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                let block = ind.listBlock(blockNumber)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                let block = eng.listBlock(blockNumber)
                 for (let i of blockNumber) {
                     block += `@${i.replace('@c.us', '')}\n`
                 }
                 await bocchi.sendTextWithMentions(from, block)
             break
             case prefix+'ownerbot':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 await bocchi.sendContact(from, ownerNumber)
             break
             case prefix+'runtime': // BY HAFIZH
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 const formater = (seconds) => {
                     const pad = (s) => {
                         return (s < 10 ? '0' : '') + s
@@ -1877,47 +1878,47 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'ping':
             case prefix+'p':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 await bocchi.sendText(from, `Pong!\nSpeed: ${processTime(t, moment())} secs`)
             break
             case prefix+'delete':
             case prefix+'del':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!quotedMsg) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (!quotedMsgObj.fromMe) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!quotedMsg) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (!quotedMsgObj.fromMe) return await bocchi.reply(from, eng.wrongFormat(), id)
                 await bocchi.deleteMessage(quotedMsgObj.chatId, quotedMsgObj.id, false)
             break
             case prefix+'report':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.emptyMess(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.emptyMess(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const lastReport = daily.getLimit(sender.id, _daily)
                 if (lastReport !== undefined && cd - (Date.now() - lastReport) > 0) {
                     const time = ms(cd - (Date.now() - lastReport))
-                    await bocchi.reply(from, ind.daily(time), id)
+                    await bocchi.reply(from, eng.daily(time), id)
                 } else {
                     if (isGroupMsg) {
                         await bocchi.sendText(ownerNumber, `*── 「 REPORT 」 ──*\n\n*From*: ${pushname}\n*ID*: ${sender.id}\n*Group*: ${(name || formattedTitle)}\n*Message*: ${q}`)
-                        await bocchi.reply(from, ind.received(pushname), id)
+                        await bocchi.reply(from, eng.received(pushname), id)
                     } else {
                         await bocchi.sendText(ownerNumber, `*── 「 REPORT 」 ──*\n\n*From*: ${pushname}\n*ID*: ${sender.id}\n*Message*: ${q}`)
-                        await bocchi.reply(from, ind.received(pushname), id)
+                        await bocchi.reply(from, eng.received(pushname), id)
                     }
                     daily.addLimit(sender.id, _daily)
                 }
             break
             case prefix+'tos':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                await bocchi.sendLinkWithAutoPreview(from, 'https://github.com/SlavyanDesu/BocchiBot', ind.tos(ownerNumber))
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                await bocchi.sendLinkWithAutoPreview(from, 'https://github.com/SlavyanDesu/BocchiBot', eng.tos(ownerNumber))
             break
             case prefix+'join':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('chat.whatsapp.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('chat.whatsapp.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const checkInvite = await bocchi.inviteInfo(url)
                 if (isOwner) {
                     await bocchi.joinGroupViaLink(url)
-                    await bocchi.reply(from, ind.ok(), id)
+                    await bocchi.reply(from, eng.ok(), id)
                     await bocchi.sendText(checkInvite.id, `Hello!! I was invited by ${pushname}`)
                 } else {
                     const getGroupData = await bocchi.getAllGroups()
@@ -1926,25 +1927,25 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     } else if (getGroupData.size <= memberLimit) {
                         await bocchi.reply(from, `Invite refused. Minimum member is: ${memberLimit}`, id)
                     } else {
-                        if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                        if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                         limit.addLimit(sender.id, _limit, isPremium, isOwner)
                         await bocchi.joinGroupViaLink(url)
-                        await bocchi.reply(from, ind.ok(), id)
+                        await bocchi.reply(from, eng.ok(), id)
                         await bocchi.sendText(checkInvite.id, `Hello!! I was invited by ${pushname}`)
                     }
                 }
             break
             case prefix+'premiumcheck':
             case prefix+'cekpremium':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
                 const cekExp = ms(premium.getPremiumExpired(sender.id, _premium) - Date.now())
                 await bocchi.reply(from, `*── 「 PREMIUM EXPIRED 」 ──*\n\n➸ *ID*: ${sender.id}\n➸ *Premium left*: ${cekExp.days} day(s) ${cekExp.hours} hour(s) ${cekExp.minutes} minute(s)`, id)
             break
             case prefix+'premiumlist':
             case prefix+'listpremium':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 let listPremi = '*── 「 PREMIUM USERS 」 ──*\n\n'
                 const deret = premium.getAllPremiumUser(_premium)
@@ -1957,10 +1958,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 await bocchi.reply(from, listPremi, id)
             break
             case prefix+'getpic':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (mentionedJidList.length !== 0) {
                     const userPic = await bocchi.getProfilePicFromServer(mentionedJidList[0])
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     if (userPic === undefined) {
                         var pek = errorImg
@@ -1970,7 +1971,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.sendFileFromUrl(from, pek, 'pic.jpg', '', id)
                 } else if (args.length !== 0) {
                     const userPic = await bocchi.getProfilePicFromServer(args[0] + '@c.us')
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     if (userPic === undefined) {
                         var peks = errorImg
@@ -1979,22 +1980,22 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     }
                     await bocchi.sendFileFromUrl(from, peks, 'pic.jpg', '', id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'serial':
-                if (!isRegistered) return await bocchi.reply(from, ind.registered(), id)
-                if (isGroupMsg) return await bocchi.reply(from, ind.pcOnly(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.registered(), id)
+                if (isGroupMsg) return await bocchi.reply(from, eng.pcOnly(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
                 const serials = args[0]
                 if (register.checkRegisteredUserFromSerial(serials, _registered)) {
                     const name = register.getRegisteredNameFromSerial(serials, _registered)
                     const age = register.getRegisteredAgeFromSerial(serials, _registered)
                     const time = register.getRegisteredTimeFromSerial(serials, _registered)
                     const id = register.getRegisteredIdFromSerial(serials, _registered)
-                    await bocchi.sendText(from, ind.registeredFound(name, age, time, serials, id))
+                    await bocchi.sendText(from, eng.registeredFound(name, age, time, serials, id))
                 } else {
-                    await bocchi.sendText(from, ind.registeredNotFound(serials))
+                    await bocchi.sendText(from, eng.registeredNotFound(serials))
                 }
             break
             case prefix+'limit':
@@ -2004,10 +2005,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
             // Weeb zone
             case prefix+'neko':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Get neko image...')
                 await bocchi.sendFileFromUrl(from, (await neko.sfw.neko()).url, 'neko.jpg', '', null, null, true)
                     .then(() => console.log('Success sending neko image!'))
@@ -2018,11 +2019,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'character': // by Anto
             case prefix+'chara':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 try {
                     const chara_key = await axios.get(`http://lolhuman.herokuapp.com/api/character/${q}?apikey=${config.lol}`)
                     const { name, description, favourites, media, image } = chara_key.data.result
@@ -2040,10 +2041,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'wallpaper':
             case prefix+'wp':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Get wallpaper image...')
                 await bocchi.sendFileFromUrl(from, (await neko.sfw.wallpaper()).url, 'wallpaper.jpg', '', null, null, true)
                     .then(() => console.log('Success sending wallpaper image!'))
@@ -2053,10 +2054,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'kemono':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Get kemonomimi image...')
                 await bocchi.sendFileFromUrl(from, (await neko.sfw.kemonomimi()).url, 'kemono.jpg', '', null, null, true)
                     .then(() => console.log('Success sending kemonomimi image!'))
@@ -2066,11 +2067,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'kusonime':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.anime(q)
                     .then(async ({ info, link_dl, sinopsis, thumb, title, error, status }) => {
                         if (status === false) {
@@ -2087,11 +2088,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'komiku':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.manga(q)
                     .then(async ({ genre, info, link_dl, sinopsis, thumb }) => {
                         let mangak = `${info}${genre}\nSinopsis: ${sinopsis}\nLink download:\n${link_dl}`
@@ -2104,11 +2105,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'wait':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const _mimetype = isQuotedImage ? quotedMsg.mimetype : mimetype
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
@@ -2135,16 +2136,16 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'source':
             case prefix+'sauce':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     try {
@@ -2166,14 +2167,14 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, 'Error!', id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'waifu':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.waifu(false)
                     .then(async ({ url }) => {
                         await bocchi.sendFileFromUrl(from, url, 'waifu.png', '', id)
@@ -2185,10 +2186,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'anitoki':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.anitoki()
                     .then(async ({ result }) => {
                         let anitoki = '*── 「 ANITOKI LATEST 」 ──*'
@@ -2203,10 +2204,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'neonime':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.neonime()
                     .then(async ({ status, result }) => {
                         if (status !== 200) return await bocchi.reply(from, 'Not found.', id)
@@ -2224,10 +2225,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'anoboy':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 weeaboo.anoboy()
                     .then(async ({ result }) => {
                         let anoboyInfo = '*── 「 ANOBOY ON-GOING 」 ──*'
@@ -2244,8 +2245,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'nimesticker': // by CHIKAA CHANTEKKXXZZ
             case prefix+'animesticker': 
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 weeaboo.snime()
                     .then(async (body) => {
@@ -2260,8 +2261,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'quotenime':
             case prefix+'quotesnime':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 console.log('Sending random quote...')
                 const quoteznime = await axios.get('https://mhankbarbar.tech/api/quotesnime/random')
@@ -2275,11 +2276,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
             // Fun
             case prefix+'bapak': // By Kris
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 axios.get(`https://api.terhambar.com/bpk?kata=${q}`)
                     .then(async (res) => await bocchi.reply(from, res.data.text, id))
                     .catch(async (err) => {
@@ -2288,10 +2289,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'puisi': // By Kris
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 axios.get('https://masgi.herokuapp.com/api/puisi2')
                     .then(async (res) => await bocchi.reply(from, res.data.data, id))
                     .catch(async (err) => {
@@ -2300,10 +2301,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'cerpen': // By Kris
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 axios.get('https://masgi.herokuapp.com/api/cerpen')
                     .then(async (res) => await bocchi.reply(from, res.data.data, id))
                     .catch(async (err) => {
@@ -2312,10 +2313,10 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'creepyfact': // By Kris
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fetch('https://raw.githubusercontent.com/TheSploit/CreepyFact/main/creepy.txt')
                     .then((res) => res.text())
                     .then(async (body) => {
@@ -2329,20 +2330,20 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'quotes':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 misc.quotes()
                 .then(async ({ result }) => {
                     await bocchi.reply(from, `➸ *Quotes*: ${result.quotes}\n➸ *Author*: ${result.author}`, id)
                 })
             break
             case prefix+'asupan': // shansekai
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fun.asupan()
                     .then(async (body) => {
                         const asupan = body.split('\n')
@@ -2356,8 +2357,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'citacita': // Piyobot
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.cita()
                     .then(async (body) => {
@@ -2371,9 +2372,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'dadu': // by CHIKAA CHANTEKKXXZZ
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.dadu()
                     .then(async (body) => {
@@ -2388,9 +2389,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'dogesticker': // by CHIKAA CHANTEKKXXZZ
             case prefix+'doge':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.doge()
                     .then(async (body) => {
@@ -2405,8 +2406,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'profile':
             case prefix+'me':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 if (quotedMsg) {
                     const getQuoted = quotedMsgObj.sender.id
@@ -2425,7 +2426,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     } else {
                         pfp = profilePic
                     }
-                    await bocchi.sendFileFromUrl(from, pfp, `${username}.jpg`, ind.profile(username, status, premi, benet, adm, levelMe, req, xpMe), id)
+                    await bocchi.sendFileFromUrl(from, pfp, `${username}.jpg`, eng.profile(username, status, premi, benet, adm, levelMe, req, xpMe), id)
                 } else {
                     const profilePic = await bocchi.getProfilePicFromServer(sender.id)
                     const username = pushname
@@ -2442,15 +2443,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     } else {
                         pfps = profilePic
                     }
-                    await bocchi.sendFileFromUrl(from, pfps, `${username}.jpg`, ind.profile(username, status, premi, benet, adm, levelMe, req, xpMe), id)
+                    await bocchi.sendFileFromUrl(from, pfps, `${username}.jpg`, eng.profile(username, status, premi, benet, adm, levelMe, req, xpMe), id)
                 }
             break
             case prefix+'hartatahta':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating harta tahta text...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/hartatahta?text=${q}&apikey=${config.vhtear}`, `${q}.jpg`, '', id)
                     .then(() => console.log('Success creating image!'))
@@ -2461,13 +2462,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'partner':
             case prefix+'pasangan':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const nama = q.substring(0, q.indexOf('|') - 1)
                 const pasangan = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fun.pasangan(nama, pasangan)
                     .then(async ({ result }) => {
                         await bocchi.reply(from, result.hasil, id)
@@ -2480,11 +2481,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'zodiac':
             case prefix+'zodiak':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fun.zodiak(args[0])
                     .then(async ({ result }) => {
                         if (result.status === 204) {
@@ -2502,11 +2503,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'write':
             case prefix+'nulis':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating writing...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/write?text=${q}&apikey=${config.vhtear}`, 'nulis.jpg', '', id)
                     .then(() => console.log('Success sending write image!'))
@@ -2516,11 +2517,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'ffbanner': // By: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating FF banner...')
                 const teks1ffanjg = q.substring(0, q.indexOf('|') - 1)
                 const teks2ffanjg = q.substring(q.lastIndexOf('|') + 2)
@@ -2528,11 +2529,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 console.log('Success!')
             break
             case prefix+'caklontong': //By: VideFrelan
-                if (!isGroupMsg) return bocchi.reply(from, ind.groupOnly(), id)
-                if (!isRegistered) return  bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isGroupMsg) return bocchi.reply(from, eng.groupOnly(), id)
+                if (!isRegistered) return  bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const sleep = (ms) => {
                     return new Promise(resolve => setTimeout(resolve, ms))
                 }
@@ -2554,11 +2555,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'tebakgambar':
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const tsleep = (ms) => {
                     return new Promise(resolve => setTimeout(resolve, ms))
                 }
@@ -2584,11 +2585,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break    
             case prefix+'fflogo': // By: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating FF logo...')
                 const karakter = q.substring(0, q.indexOf('|') - 1)
                 const teksff = q.substring(q.lastIndexOf('|') + 2)
@@ -2597,20 +2598,20 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'text3d':
             case prefix+'3dtext':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating 3D text...')
                 await bocchi.sendFileFromUrl(from, `https://docs-jojo.herokuapp.com/api/text3d?text=${q}`,`${q}.jpg`, '', id)
                 console.log('Success creating 3D text!')
             break
             case prefix+'simi': // by: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.simi(q)
                     .then(async ({ jawaban }) => {
@@ -2623,13 +2624,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'glitchtext':
             case prefix+'glitext':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const teks1 = q.substring(0, q.indexOf('|') - 1)
                 const teks2 = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating glitch text...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/glitchtext?text1=${teks1}&text2=${teks2}&apikey=${config.vhtear}`, 'glitch.jpg', '', id)
                     .then(() => console.log('Success creating image!'))
@@ -2639,13 +2640,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'phmaker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const kiri = q.substring(0, q.indexOf('|') - 1)
                 const kanan = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating Pornhub text...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/pornlogo?text1=${kiri}&text2=${kanan}&apikey=${config.vhtear}`, 'ph.jpg', '', id)
                     .then(() => console.log('Success creating image!'))
@@ -2655,11 +2656,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'blackpink':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating Blackpink text...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/blackpinkicon?text=${q}&apikey=${config.vhtear}`, `${q}.jpg`, '', id)
                     .then(() => console.log('Success creting image!'))
@@ -2669,11 +2670,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'galaxy':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating galaxy text...')
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/galaxytext?text=${q}&apikey=${config.vhtear}`, `${q}.jpg`, '', id)
                     .then(() => console.log('Success creating image!'))
@@ -2683,19 +2684,19 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'tod':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 await bocchi.reply(from, 'Sebelum bermain berjanjilah akan melaksanakan apapun perintah yang diberikan.' , id)
                 await bocchi.sendText(from, `Silakan ketik *${prefix}truth* atau *${prefix}dare*`)
             break
             case prefix+'weton':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const tgl = q.substring(0, q.indexOf('|') - 1)
                 const bln = q.substring(q.indexOf('|') + 2, q.lastIndexOf('|') - 1)
                 const thn = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fun.weton(tgl, bln, thn)
                     .then(async ({ result }) => {
                         await bocchi.reply(from, result.hasil, id)
@@ -2707,8 +2708,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'truth':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.truth()
                     .then(async (body) => {
@@ -2722,11 +2723,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'hilih':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 fun.hilihteks(q)
                     .then(async ( { result }) => {
                         await bocchi.reply(from, result.kata, id)
@@ -2738,8 +2739,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'dare':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 fun.dare()
                     .then(async (body) => {
@@ -2753,11 +2754,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'triggered':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     console.log(color('[WAPI]', 'green'), 'Downloading and decrypting media...')
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
@@ -2789,16 +2790,16 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                                 .save(fileOutputPath)
                         })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'trash':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 try {
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     for (let i = 0; i < mentionedJidList.length; i++) {
                         const ypics = await bocchi.getProfilePicFromServer(mentionedJidList[i])
                         if (ypics === undefined) {
@@ -2819,12 +2820,12 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'hitler':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 try {
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     for (let i = 0; i < mentionedJidList.length; i++) {
                         const ypics = await bocchi.getProfilePicFromServer(mentionedJidList[i])
                         if (ypics === undefined) {
@@ -2845,27 +2846,27 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'wasted':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && type === 'image' || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     const encryptMediaWt = isQuotedImage ? quotedMsg : message
                     const dataPotoWt = await decryptMedia(encryptMediaWt, uaOverride)
                     const fotoWtNya = await uploadImages(dataPotoWt, `fotoProfilWt.${sender.id}`)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, `https://some-random-api.ml/canvas/wasted?avatar=${fotoWtNya}`, 'Wasted.jpg', 'Ini..., sticker nya lagi di kirim', id).then(() => bocchi.sendStickerfromUrl(from, `https://some-random-api.ml/canvas/wasted?avatar=${fotoWtNya}`))
                     console.log('Success sending Wasted image!')
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'kiss':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 try {
                     if (isMedia && isImage || isQuotedImage) {
-                        if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                        if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                         limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                        await bocchi.reply(from, ind.wait(), id)
+                        await bocchi.reply(from, eng.wait(), id)
                         const encryptMedia = isQuotedImage ? quotedMsg : message
                         const ppRaw = await bocchi.getProfilePicFromServer(sender.id)
                         const ppSecond = await decryptMedia(encryptMedia, uaOverride)
@@ -2881,7 +2882,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                                 fs.unlinkSync(`${sender.id}_kiss.png`)
                             })
                     } else {
-                        await bocchi.reply(from, ind.wrongFormat(), id)
+                        await bocchi.reply(from, eng.wrongFormat(), id)
                     }
                 } catch (err) {
                     console.error(err)
@@ -2889,9 +2890,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'phcomment':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const usernamePh = q.substring(0, q.indexOf('|') - 1)
                 const commentPh = q.substring(q.lastIndexOf('|') + 2)
@@ -2903,70 +2904,70 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
                 const dataPpPh = await bent('buffer')(ppPh)
                 const linkPpPh = await uploadImages(dataPpPh, `${sender.id}_ph`)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 const preprocessPh = await axios.get(`https://nekobot.xyz/api/imagegen?type=phcomment&image=${linkPpPh}&text=${commentPh}&username=${usernamePh}`)
                 await bocchi.sendFileFromUrl(from, preprocessPh.data.message, 'ph.jpg', '', id)
                 console.log('Success creating image!')
             break
             case prefix+'neontext':
             case prefix+'neon':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const atasnya = q.substring(0, q.indexOf('|') - 1)
                 const tengahnya = q.substring(q.indexOf('|') + 2, q.lastIndexOf('|') - 1)
                 const bawahnya = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendFileFromUrl(from, `http://docs-jojo.herokuapp.com/api/neon?text1=${atasnya}&text2=${tengahnya}&text3=${bawahnya}`, 'neon.jpg', '', id)
                 console.log('Success creating image!')
             break
             case prefix+'firemaker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/fire_maker?text=${q}&apikey=${config.vhtear}`)
                 console.log('Success creating image!')
             break
             case prefix+'mlmaker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const namaHero = q.substring(0, q.indexOf('|') - 1)
                 const teksMl = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/logoml?hero=${namaHero}&text=${teksMl}&apikey=${config.vhtear}`)
                 console.log('Success creating image!')
             break
             case prefix+'balloonmaker':
             case prefix+'blmaker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const namaKiri = q.substring(0, q.indexOf('|') - 1)
                 const namaKanan = q.substring(q.lastIndexOf('|') + 2)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendFileFromUrl(from, `https://api.vhtear.com/balloonmaker?text1=${namaKiri}&text2=${namaKanan}&apikey=${config.vhtear}`)
                 console.log('Success creating image!')
             break
             case prefix+'sliding':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendVideoAsGif(from, `https://api.vhtear.com/slidingtext?text=${q}&apikey=${config.vhtear}`, 'sliding.gif', '', id)
                 console.log('Success creating GIF!')
             break
             case prefix+'text': // by: irham01
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
                 try {
                     if (ar[0] === 'burnpaper') {
                         const vfburn = await axios.get(`https://videfikri.com/api/textmaker/burnpaper/?text=${args[1]}`)
@@ -2996,7 +2997,7 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         const vftiktokeffect = await axios.get(`https://videfikri.com/api/textmaker/tiktokeffect/?text=${args[1]}`)
                         await bocchi.sendFileFromUrl(from, vftiktokeffect.data.result.img, `${q}.jpg`, '', id)
                     } else {
-                        await bocchi.reply(from, ind.menuText(), id)
+                        await bocchi.reply(from, eng.menuText(), id)
                     }
                 } catch (err) {
                     console.error(err)
@@ -3007,11 +3008,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             // Sticker
             case prefix+'stikernobg':
             case prefix+'stickernobg': // by: VideFrelan
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const q = await uploadImages(mediaData, `stickernobg.${sender.id}`)
@@ -3025,18 +3026,18 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'stickerwm': // By Slavyan
             case prefix+'stcwm':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const packname = q.substring(0, q.indexOf('|') - 1)
                     const author = q.substring(q.lastIndexOf('|') + 2)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
@@ -3046,17 +3047,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.sendImageAsSticker(from, imageBase64, { author: author, pack: packname })
                     console.log(`Sticker processed for ${processTime(t, moment())} seconds`)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'stickermeme': //Chika Chantexx
             case prefix+'stcmeme':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const top = q.substring(0, q.indexOf('|') - 1)
                     const topp = top.replace('', '_').replace('\n','%5Cn').replace('?', '~q').replace('%', '~p').replace('#', '~h').replace('/', '~s')
                     const bottom = q.substring(q.lastIndexOf('|') + 2)
@@ -3067,31 +3068,31 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     const create = `https://api.memegen.link/images/custom/${topp}/${bottomm}.png?background=${getUrl}`
                     await bocchi.sendStickerfromUrl(from, create, null, { author: authorWm, pack: packWm, keepScale: true })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'takestick': // By: VideFrelan, Chika Chantexx
             case prefix+'take':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q.includes('|')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q.includes('|')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (quotedMsg && quotedMsg.type == 'sticker') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const mediaDataTake = await decryptMedia(quotedMsg)
                     const packname = q.substring(0, q.indexOf('|') - 1)
                     const author = q.substring(q.lastIndexOf('|') + 2)
                     const imageBase64 = `data:${quotedMsg.mimetype};base64,${mediaDataTake.toString('base64')}`
                     await bocchi.sendImageAsSticker(from, imageBase64, { author: author, pack: packname })
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'sticker':
             case prefix+'stiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const _mimetype = isQuotedImage ? quotedMsg.mimetype : mimetype
@@ -3099,15 +3100,15 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.sendImageAsSticker(from, imageBase64, { author: authorWm, pack: packWm })
                     console.log(`Sticker processed for ${processTime(t, moment())} seconds`)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'stickerp':
             case prefix+'stikerp':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const _mimetype = isQuotedImage ? quotedMsg.mimetype : mimetype
@@ -3115,18 +3116,18 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     await bocchi.sendImageAsSticker(from, imageBase64, { author: authorWm, pack: packWm, keepScale: true })
                     console.log(`Sticker processed for ${processTime(t, moment())} seconds`)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'stickergif':
             case prefix+'stikergif':
             case prefix+'sgif':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
                 if (isMedia && isVideo || isGif || isQuotedVideo || isQuotedGif) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const encryptMedia = isQuotedGif || isQuotedVideo ? quotedMsg : message
                         const mediaData = await decryptMedia(encryptMedia, uaOverride)
@@ -3137,18 +3138,18 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             })
                     } catch (err) {
                         console.error(err)
-                        await bocchi.reply(from, ind.videoLimit(), id)
+                        await bocchi.reply(from, eng.videoLimit(), id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'ttg':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 await bocchi.sendStickerfromUrl(from, `https://api.vhtear.com/textxgif?text=${q}&apikey=${config.vhtear}`, null, { author: authorWm, pack: packWm })
                     .then(() => console.log('Success creating GIF!'))
                     .catch(async (err) => {
@@ -3159,11 +3160,11 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             case prefix+'stickertoimg':
             case prefix+'stikertoimg':
             case prefix+'toimg':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isQuotedSticker) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const mediaData = await decryptMedia(quotedMsg, uaOverride)
                         const imageBase64 = `data:${quotedMsg.mimetype};base64,${mediaData.toString('base64')}`
@@ -3173,21 +3174,21 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, 'Error!', id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'emojisticker':
             case prefix+'emojistiker':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const emoji = emojiUnicode(args[0])
-                await bocchi.reply(from, ind.wait(), id)
+                await bocchi.reply(from, eng.wait(), id)
                 console.log('Creating emoji code for =>', emoji)
                 await bocchi.sendStickerfromUrl(from, `https://api.vhtear.com/emojitopng?code=${emoji}&apikey=${config.vhtear}`, null, { author: authorWm, pack: packWm })
                     .then(async () => {
-                        await bocchi.reply(from, ind.ok(), id)
+                        await bocchi.reply(from, eng.ok(), id)
                         console.log(`Sticker processed for ${processTime(t, moment())} seconds`)
                     })
                     .catch(async (err) => {
@@ -3202,37 +3203,37 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             case prefix+'mlewds':
             case prefix+'mlewd':
                 // Premium feature, contact the owner.
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 } else {
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 }
             break
             case prefix+'multifetish':
             case prefix+'mfetish':
                 // Premium feature, contact the owner.
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 } else {
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 }
             break
             case prefix+'lewds':
             case prefix+'lewd':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     nsfw.randomLewd()
                         .then(async ({ url }) => {
                             await bocchi.sendFileFromUrl(from, url, 'lewd.jpg', '', null, null, true)
@@ -3243,9 +3244,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     nsfw.randomLewd()
                         .then(async ({ url }) => {
                             await bocchi.sendFileFromUrl(from, url, 'lewd.jpg', '', null, null, true)
@@ -3258,13 +3259,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'fetish':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (ar.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (ar.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         if (ar[0] === 'armpits') {
                             nsfw.armpits()
@@ -3322,9 +3323,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, err, id)
                     }
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         if (ar[0] === 'armpits') {
                             nsfw.armpits()
@@ -3385,14 +3386,14 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
             break
             case prefix+'nhentai':
             case prefix+'nh':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (isNaN(Number(args[0]))) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (isNaN(Number(args[0]))) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     console.log(`Searching nHentai for ${args[0]}...`)
                     const validate = await nhentai.exists(args[0])
                     if (validate === true) {
@@ -3412,12 +3413,12 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         }
                     } else {
-                        await bocchi.reply(from, ind.nhFalse(), id)
+                        await bocchi.reply(from, eng.nhFalse(), id)
                     }
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     console.log(`Searching nHentai for ${args[0]}...`)
                     const validate = await nhentai.exists(args[0])
                     if (validate === true) {
@@ -3437,30 +3438,30 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         }
                     } else {
-                        await bocchi.reply(from, ind.nhFalse(), id)
+                        await bocchi.reply(from, eng.nhFalse(), id)
                     }
                 }
             break
             case prefix+'nhdl':
                 // Premium feature, contact the owner.
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 } else {
-                    if (!isPremium) return await bocchi.reply(from, ind.notPremium(), id)
-                    await bocchi.reply(from, ind.botNotPremium(), id)
+                    if (!isPremium) return await bocchi.reply(from, eng.notPremium(), id)
+                    await bocchi.reply(from, eng.botNotPremium(), id)
                 }
             break
             case prefix+'nhsearch':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     console.log(`Searching nHentai for ${q}...`)
                     nana.search(q)
                         .then(async (g) => {
@@ -3477,9 +3478,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     console.log(`Searching nHentai for ${q}...`)
                     nana.search(q)
                         .then(async (g) => {
@@ -3498,12 +3499,12 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'nekopoi':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const res = await nekobocc.latest()
                         let text = '*── 「 NEKOPOI LATEST 」 ──*'
@@ -3517,9 +3518,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, 'Error!', id)
                     }
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const res = await nekobocc.latest()
                         let text = '*── 「 NEKOPOI LATEST 」 ──*'
@@ -3535,13 +3536,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'nekosearch':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const res = await nekobocc.search(q)
                         let text = '*── 「 NEKOPOI 」 ──*'
@@ -3555,9 +3556,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, 'Error!', id)
                     }
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         const res = await nekobocc.search(q)
                         let text = '*── 「 NEKOPOI 」 ──*'
@@ -3573,8 +3574,8 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'lolivid':  //Piyobot
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 weeaboo.loli()
                     .then(async (body) => {
@@ -3588,12 +3589,12 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     })
             break
             case prefix+'waifu18':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     weeaboo.waifu(true)
                         .then(async ({ url }) => {
                             await bocchi.sendFileFromUrl(from, url, 'waifu.png', '', id)
@@ -3604,9 +3605,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     weeaboo.waifu(true)
                         .then(async ({ url }) => {
                             await bocchi.sendFileFromUrl(from, url, 'waifu.png', '', id)
@@ -3619,13 +3620,13 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'phdl':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isUrl(url) && !url.includes('pornhub.com')) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isUrl(url) && !url.includes('pornhub.com')) return await bocchi.reply(from, eng.wrongFormat(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         nsfw.phDl(url)
                             .then(async ({ title, download_urls, thumbnail_url }) => {
@@ -3647,9 +3648,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                         await bocchi.reply(from, 'Error!', id)
                     }
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     try {
                         nsfw.phDl(url)
                             .then(async ({ title, download_urls, thumbnail_url }) => {
@@ -3673,57 +3674,57 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'yuri':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.eroYuri()).url, 'yuri.jpg', '', id)
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.eroYuri()).url, 'yuri.jpg', '', id)
                 }
             break
             case prefix+'lewdavatar':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.avatar()).url, 'avatar.jpg', '', id)
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.avatar()).url, 'avatar.jpg', '', id)
                 }
             break
             case prefix+'femdom':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.femdom()).url, 'femdom.jpg', '', id)
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     await bocchi.sendFileFromUrl(from, (await neko.nsfw.femdom()).url, 'femdom.jpg', '', id)
                 }
             break
             case prefix+'cersex':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 if (isGroupMsg) {
-                    if (!isNsfw) return await bocchi.reply(from, ind.notNsfw(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (!isNsfw) return await bocchi.reply(from, eng.notNsfw(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     nsfw.cersex()
                         .then(async ({ result }) => {
                             await bocchi.sendFileFromUrl(from, result.image, 'cersex.jpg', `*── 「 ${result.judul} 」 ──*\n\n${result.cerita}`, id)
@@ -3734,9 +3735,9 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                             await bocchi.reply(from, 'Error!', id)
                         })
                 } else {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     nsfw.cersex()
                         .then(async ({ result }) => {
                             await bocchi.sendFileFromUrl(from, result.image, 'cersex.jpg', `*── 「 ${result.judul} 」 ──*\n\n${result.cerita}`, id)
@@ -3751,52 +3752,52 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
 
             // Moderation command
             case prefix+'revoke':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return bocchi.reply(from, ind.botNotAdmin(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return bocchi.reply(from, eng.botNotAdmin(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.revokeGroupInviteLink(groupId)
                 await bocchi.sendTextWithMentions(from, `Group link revoked by @${sender.id.replace('@c.us', '')}`)
             break
             case prefix+'grouplink':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const gcLink = await bocchi.getGroupInviteLink(groupId)
                 await bocchi.reply(from, gcLink, id)
             break
             case prefix+'mutegc':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return bocchi.reply(from, ind.botNotAdmin(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return bocchi.reply(from, eng.botNotAdmin(), id)
                 if (ar[0] === 'enable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     await bocchi.setGroupToAdminsOnly(groupId, true)
-                    await bocchi.sendText(from, ind.gcMute())
+                    await bocchi.sendText(from, eng.gcMute())
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     await bocchi.setGroupToAdminsOnly(groupId, false)
-                    await bocchi.sendText(from, ind.gcUnmute())
+                    await bocchi.sendText(from, eng.gcUnmute())
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'add':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
-                if (args.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
+                if (args.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
                 try {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     await bocchi.addParticipant(from, `${args[0]}@c.us`)
                     await bocchi.sendText(from, '🎉 Welcome! 🎉')
@@ -3806,64 +3807,64 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'kick':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
-                if (mentionedJidList.length === 0) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
+                if (mentionedJidList.length === 0) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.sendTextWithMentions(from, `Good bye~\n${mentionedJidList.map(x => `@${x.replace('@c.us', '')}`).join('\n')}`)
                 for (let i of mentionedJidList) {
-                    if (groupAdmins.includes(i)) return await bocchi.sendText(from, ind.wrongFormat())
+                    if (groupAdmins.includes(i)) return await bocchi.sendText(from, eng.wrongFormat())
                     await bocchi.removeParticipant(groupId, i)
                 }
             break
             case prefix+'promote':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
-                if (mentionedJidList.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (groupAdmins.includes(mentionedJidList[0])) return await bocchi.reply(from, ind.adminAlready(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
+                if (mentionedJidList.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (groupAdmins.includes(mentionedJidList[0])) return await bocchi.reply(from, eng.adminAlready(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.promoteParticipant(groupId, mentionedJidList[0])
-                await bocchi.reply(from, ind.ok(), id)
+                await bocchi.reply(from, eng.ok(), id)
             break
             case prefix+'demote':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
-                if (mentionedJidList.length !== 1) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
-                if (!groupAdmins.includes(mentionedJidList[0])) return await bocchi.reply(from, ind.notAdmin(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
+                if (mentionedJidList.length !== 1) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
+                if (!groupAdmins.includes(mentionedJidList[0])) return await bocchi.reply(from, eng.notAdmin(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 await bocchi.demoteParticipant(groupId, mentionedJidList[0])
-                await bocchi.reply(from, ind.ok(), id)
+                await bocchi.reply(from, eng.ok(), id)
             break
             case prefix+'leave':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 await bocchi.sendText(from, 'Bye~ 👋')
                 await bocchi.leaveGroup(groupId)
             break
             case prefix+'admins':
             case prefix+'admin':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const groupAdm = await bocchi.getGroupAdmins(groupId)
                 const lastAdmin = daily.getLimit(sender.id, _daily)
                 if (lastAdmin !== undefined && cd - (Date.now() - lastAdmin) > 0) {
                     const time = ms(cd - (Date.now() - lastAdmin))
-                    await bocchi.reply(from, ind.daily(time), id)
+                    await bocchi.reply(from, eng.daily(time), id)
                 } else if (isOwner) {
                     let txt = '╔══✪〘 *ADMINS* 〙✪══\n'
                     for (let i = 0; i < groupAdm.length; i++) {
@@ -3884,16 +3885,16 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'everyone':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                 limit.addLimit(sender.id, _limit, isPremium, isOwner)
                 const groupMem = await bocchi.getGroupMembers(groupId)
                 const lastEveryone = daily.getLimit(sender.id, _daily)
                 if (lastEveryone !== undefined && cd - (Date.now() - lastEveryone) > 0) {
                     const time = ms(cd - (Date.now() - lastEveryone))
-                    await bocchi.reply(from, ind.daily(time), id)
+                    await bocchi.reply(from, eng.daily(time), id)
                 } else if (isOwner || isPremium) {
                     let txt = '╔══✪〘 *EVERYONE* 〙✪══\n'
                         for (let i = 0; i < groupMem.length; i++) {
@@ -3914,234 +3915,234 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'groupicon':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return bocchi.reply(from, ind.botNotAdmin(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return bocchi.reply(from, eng.botNotAdmin(), id)
                 if (isMedia && isImage || isQuotedImage) {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
-                    await bocchi.reply(from, ind.wait(), id)
+                    await bocchi.reply(from, eng.wait(), id)
                     const encryptMedia = isQuotedImage ? quotedMsg : message
                     const _mimetype = isQuotedImage ? quotedMsg.mimetype : mimetype
                     const mediaData = await decryptMedia(encryptMedia, uaOverride)
                     const imageBase64 = `data:${_mimetype};base64,${mediaData.toString('base64')}`
                     await bocchi.setGroupIcon(groupId, imageBase64)
-                    await bocchi.sendText(from, ind.ok())
+                    await bocchi.sendText(from, eng.ok())
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'antilink':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
                 if (ar[0] === 'enable') {
-                    if (isDetectorOn) return await bocchi.reply(from, ind.detectorOnAlready(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (isDetectorOn) return await bocchi.reply(from, eng.detectorOnAlready(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _antilink.push(groupId)
                     fs.writeFileSync('./database/group/antilink.json', JSON.stringify(_antilink))
-                    await bocchi.reply(from, ind.detectorOn(name, formattedTitle), id)
+                    await bocchi.reply(from, eng.detectorOn(name, formattedTitle), id)
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _antilink.splice(groupId, 1)
                     fs.writeFileSync('./database/group/antilink.json', JSON.stringify(_antilink))
-                    await bocchi.reply(from, ind.detectorOff(), id)
+                    await bocchi.reply(from, eng.detectorOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'leveling':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 if (ar[0] === 'enable') {
-                    if (isLevelingOn) return await bocchi.reply(from, ind.levelingOnAlready(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (isLevelingOn) return await bocchi.reply(from, eng.levelingOnAlready(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _leveling.push(groupId)
                     fs.writeFileSync('./database/group/leveling.json', JSON.stringify(_leveling))
-                    await bocchi.reply(from, ind.levelingOn(), id)
+                    await bocchi.reply(from, eng.levelingOn(), id)
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _leveling.splice(groupId, 1)
                     fs.writeFileSync('./database/group/leveling.json', JSON.stringify(_leveling))
-                    await bocchi.reply(from, ind.levelingOff(), id)
+                    await bocchi.reply(from, eng.levelingOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'welcome':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 if (ar[0] === 'enable') {
-                    if (isWelcomeOn) return await bocchi.reply(from, ind.welcomeOnAlready(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (isWelcomeOn) return await bocchi.reply(from, eng.welcomeOnAlready(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _welcome.push(groupId)
                     fs.writeFileSync('./database/group/welcome.json', JSON.stringify(_welcome))
-                    await bocchi.reply(from, ind.welcomeOn(), id)
+                    await bocchi.reply(from, eng.welcomeOn(), id)
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _welcome.splice(groupId, 1)
                     fs.writeFileSync('./database/group/welcome.json', JSON.stringify(_welcome))
-                    await bocchi.reply(from, ind.welcomeOff(), id)
+                    await bocchi.reply(from, eng.welcomeOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'autosticker':
             case prefix+'autostiker':
             case prefix+'autostik':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 if (ar[0] === 'enable') {
-                    if (isAutoStickerOn) return await bocchi.reply(from, ind.autoStikOnAlready(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (isAutoStickerOn) return await bocchi.reply(from, eng.autoStikOnAlready(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _autosticker.push(groupId)
                     fs.writeFileSync('./database/group/autosticker.json', JSON.stringify(_autosticker))
-                    await bocchi.reply(from, ind.autoStikOn(), id)
+                    await bocchi.reply(from, eng.autoStikOn(), id)
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _autosticker.splice(groupId, 1)
                     fs.writeFileSync('./database/group/autosticker.json', JSON.stringify(_autosticker))
-                    await bocchi.reply(from, ind.autoStikOff(), id)
+                    await bocchi.reply(from, eng.autoStikOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'antinsfw':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
-                if (!isBotGroupAdmins) return await bocchi.reply(from, ind.botNotAdmin(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
+                if (!isBotGroupAdmins) return await bocchi.reply(from, eng.botNotAdmin(), id)
                 if (ar[0] === 'enable') {
-                    if (isDetectorOn) return await bocchi.reply(from, ind.antiNsfwOnAlready(), id)
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (isDetectorOn) return await bocchi.reply(from, eng.antiNsfwOnAlready(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _antinsfw.push(groupId)
                     fs.writeFileSync('./database/group/antinsfw.json', JSON.stringify(_antinsfw))
-                    await bocchi.reply(from, ind.antiNsfwOn(name, formattedTitle), id)
+                    await bocchi.reply(from, eng.antiNsfwOn(name, formattedTitle), id)
                 } else if (ar[0] === 'disable') {
-                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, ind.limit(), id)
+                    if (limit.isLimit(sender.id, _limit, limitCount, isPremium, isOwner)) return await bocchi.reply(from, eng.limit(), id)
                     limit.addLimit(sender.id, _limit, isPremium, isOwner)
                     _antinsfw.splice(groupId, 1)
                     fs.writeFileSync('./database/group/antinsfw.json', JSON.stringify(_antinsfw))
-                    await bocchi.reply(from, ind.antiNsfwOff(), id)
+                    await bocchi.reply(from, eng.antiNsfwOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
 
             // Owner command
             case prefix+'block':
             case prefix+'blok':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 if (mentionedJidList.length !== 0) {
                     for (let blok of mentionedJidList) {
-                        if (blok === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                        if (blok === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                         await bocchi.contactBlock(blok)
                     }
-                    await bocchi.reply(from, ind.doneOwner(), id)
+                    await bocchi.reply(from, eng.doneOwner(), id)
                 } else if (args.length === 1) {
                     await bocchi.contactBlock(args[0] + '@c.us')
-                    await bocchi.reply(from, ind.doneOwner(), id)
+                    await bocchi.reply(from, eng.doneOwner(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'unblock':
             case prefix+'unblok':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 if (mentionedJidList.length !== 0) {
                     for (let blok of mentionedJidList) {
-                        if (blok === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                        if (blok === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                         await bocchi.contactUnblock(blok)
                     }
-                    await bocchi.reply(from, ind.doneOwner(), id)
+                    await bocchi.reply(from, eng.doneOwner(), id)
                 } else if (args.length === 1) {
                     await bocchi.contactUnblock(args[0] + '@c.us')
-                    await bocchi.reply(from, ind.doneOwner(), id)
+                    await bocchi.reply(from, eng.doneOwner(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'bc':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
-                if (!q) return await bocchi.reply(from, ind.emptyMess(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
+                if (!q) return await bocchi.reply(from, eng.emptyMess(), id)
                 const chats = await bocchi.getAllChatIds()
                 for (let bcs of chats) {
                     let cvk = await bocchi.getChatById(bcs)
                     if (!cvk.isReadOnly) await bocchi.sendText(bcs, `${q}\n\n- Slavyan (Kal)\n_Broadcasted message_`)
                 }
-                await bocchi.reply(from, ind.doneOwner(), id)
+                await bocchi.reply(from, eng.doneOwner(), id)
             break
             case prefix+'clearall':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 const allChats = await bocchi.getAllChats()
                 for (let delChats of allChats) {
                     await bocchi.deleteChat(delChats.id)
                 }
-                await bocchi.reply(from, ind.doneOwner(), id)
+                await bocchi.reply(from, eng.doneOwner(), id)
             break
             case prefix+'leaveall':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
-                if (!q) return await bocchi.reply(from, ind.emptyMess(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
+                if (!q) return await bocchi.reply(from, eng.emptyMess(), id)
                 const allGroup = await bocchi.getAllGroups()
                 for (let gclist of allGroup) {
                     await bocchi.sendText(gclist.contact.id, q)
                     await bocchi.leaveGroup(gclist.contact.id)
                 }
-                await bocchi.reply(from, ind.doneOwner())
+                await bocchi.reply(from, eng.doneOwner())
             break
             case prefix+'getses':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 const ses = await bocchi.getSnapshot()
-                await bocchi.sendFile(from, ses, 'session.png', ind.doneOwner())
+                await bocchi.sendFile(from, ses, 'session.png', eng.doneOwner())
             break
             case prefix+'ban':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 if (ar[0] === 'add') {
                     if (mentionedJidList.length !== 0) {
                         for (let benet of mentionedJidList) {
-                            if (benet === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                            if (benet === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                             _ban.push(benet)
                             fs.writeFileSync('./database/bot/banned.json', JSON.stringify(_ban))
                         }
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     } else {
                         _ban.push(args[1] + '@c.us')
                         fs.writeFileSync('./database/bot/banned.json', JSON.stringify(_ban))
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     }
                 } else if (ar[0] === 'del') {
                     if (mentionedJidList.length !== 0) {
-                        if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                        if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                         _ban.splice(mentionedJidList[0], 1)
                         fs.writeFileSync('./database/bot/banned.json', JSON.stringify(_ban))
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     } else{
                         _ban.splice(args[1] + '@c.us', 1)
                         fs.writeFileSync('./database/bot/banned.json', JSON.stringify(_ban))
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'eval':
             case prefix+'ev':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
-                if (!q) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
+                if (!q) return await bocchi.reply(from, eng.wrongFormat(), id)
                 try {
                     let evaled = await eval(q)
                     if (typeof evaled !== 'string') evaled = require('util').inspect(evaled)
@@ -4152,17 +4153,17 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 }
             break
             case prefix+'shutdown':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 await bocchi.sendText(from, 'Otsukaresama deshita~ 👋')
                     .then(async () => await bocchi.kill())
                     .catch(() => new Error('Target closed.'))
             break
             case prefix+'premium':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 if (ar[0] === 'add') {
                     if (mentionedJidList.length !== 0) {
                         for (let prem of mentionedJidList) {
-                            if (prem === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                            if (prem === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                             premium.addPremiumUser(prem, args[2], _premium)
                             await bocchi.reply(from, `*── 「 PREMIUM ADDED 」 ──*\n\n➸ *ID*: ${prem}\n➸ *Expired*: ${ms(toMs(args[2])).days} day(s) ${ms(toMs(args[2])).hours} hour(s) ${ms(toMs(args[2])).minutes} minute(s)`, id)
                         }
@@ -4172,52 +4173,52 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                     }
                 } else if (ar[0] === 'del') {
                     if (mentionedJidList.length !== 0) {
-                        if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, ind.wrongFormat(), id)
+                        if (mentionedJidList[0] === botNumber) return await bocchi.reply(from, eng.wrongFormat(), id)
                         _premium.splice(premium.getPremiumPosition(mentionedJidList[0], _premium), 1)
                         fs.writeFileSync('./database/bot/premium.json', JSON.stringify(_premium))
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     } else {
                         _premium.splice(premium.getPremiumPosition(args[1] + '@c.us', _premium), 1)
                         fs.writeFileSync('./database/bot/premium.json', JSON.stringify(_premium))
-                        await bocchi.reply(from, ind.doneOwner(), id)
+                        await bocchi.reply(from, eng.doneOwner(), id)
                     }
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'setstatus':
             case prefix+'setstats':
             case prefix+'setstat':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
-                if (!q) return await bocchi.reply(from, ind.emptyMess(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
+                if (!q) return await bocchi.reply(from, eng.emptyMess(), id)
                 await bocchi.setMyStatus(q)
-                await bocchi.reply(from, ind.doneOwner(), id)
+                await bocchi.reply(from, eng.doneOwner(), id)
             break
             case prefix+'mute':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(pushname), id)
-                if (!isGroupMsg) return await bocchi.reply(from, ind.groupOnly(), id)
-                if (!isGroupAdmins) return await bocchi.reply(from, ind.adminOnly(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(pushname), id)
+                if (!isGroupMsg) return await bocchi.reply(from, eng.groupOnly(), id)
+                if (!isGroupAdmins) return await bocchi.reply(from, eng.adminOnly(), id)
                 if (ar[0] === 'enable') {
-                    if (isMute) return await bocchi.reply(from, ind.muteChatOnAlready(), id)
+                    if (isMute) return await bocchi.reply(from, eng.muteChatOnAlready(), id)
                     _mute.push(groupId)
                     fs.writeFileSync('./database/bot/mute.json', JSON.stringify(_mute))
-                    await bocchi.reply(from, ind.muteChatOn(), id)
+                    await bocchi.reply(from, eng.muteChatOn(), id)
                 } else if (ar[0] === 'disable') {
                     _mute.splice(groupId, 1)
                     fs.writeFileSync('./database/bot/mute.json', JSON.stringify(_mute))
-                    await bocchi.reply(from, ind.muteChatOff(), id)
+                    await bocchi.reply(from, eng.muteChatOff(), id)
                 } else {
-                    await bocchi.reply(from, ind.wrongFormat(), id)
+                    await bocchi.reply(from, eng.wrongFormat(), id)
                 }
             break
             case prefix+'setname':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
-                if (!q || q.length > 25) return await bocchi.reply(from, ind.wrongFormat(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
+                if (!q || q.length > 25) return await bocchi.reply(from, eng.wrongFormat(), id)
                 await bocchi.setMyName(q)
-                await bocchi.reply(from, ind.nameChanged(q), id)
+                await bocchi.reply(from, eng.nameChanged(q), id)
             break
             case prefix+'grouplist':
-                if (!isRegistered) return await bocchi.reply(from, ind.notRegistered(), id)
+                if (!isRegistered) return await bocchi.reply(from, eng.notRegistered(), id)
                 const getGroups = await bocchi.getAllGroups()
                 let txtGc = '*── 「 GROUP LIST 」 ──*\n'
                 for (let i = 0; i < getGroups.length; i++) {
@@ -4226,18 +4227,18 @@ module.exports = msgHandler = async (bocchi = new Client(), message) => {
                 await bocchi.sendText(from, txtGc)
             break
             case prefix+'reset':
-                if (!isOwner) return await bocchi.reply(from, ind.ownerOnly(), id)
+                if (!isOwner) return await bocchi.reply(from, eng.ownerOnly(), id)
                 const reset = []
                 _limit = reset
                 console.log('Hang tight, it\'s time to reset usage limits...')
                 fs.writeFileSync('./database/user/limit.json', JSON.stringify(_limit))
-                await bocchi.reply(from, ind.doneOwner(), id)
+                await bocchi.reply(from, eng.doneOwner(), id)
                 console.log('Success!')
             break
             
             default:
                 if (isCmd) {
-                    await bocchi.reply(from, ind.cmdNotFound(command), id)
+                    await bocchi.reply(from, eng.cmdNotFound(command), id)
                 }
             break
         }

@@ -1,13 +1,13 @@
 {
-    "ownerBot": "62812xxxxxxx@c.us", 
+    "ownerBot": "917003195623@c.us", 
     "prefix": "$",
     "uaOverride": "WhatsApp/2.2037.6 Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36",
     "token": "api-key",
-    "nao": "api-key",
-    "vhtear": "api-key",
+    "nao": "2b070ee0551f33f6ca785990b3564f78fa54f049",
+    "vhtear": "89bb0669331646b9b17ca78b0539fa22",
     "melodic": "administrator",
     "tobz": "api-key", 
-    "lol": "api-key",
-    "authorStick": "@SlavyanDesu",
-    "packStick": "BocchiBot"
+    "lol": "076ba6e599730e2d61f57177",
+    "authorStick": "@Soumojit",
+    "packStick": "TestBot"
 }
